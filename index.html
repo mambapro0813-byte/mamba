@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>萌爪宠物细化店</title>
+  <style>
+    :root {
+      --bg: #fff9f5;
+      --card: #ffffff;
+      --primary: #ff8b6a;
+      --accent: #6ac4ff;
+      --text: #2d2d2d;
+      --muted: #6b7280;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #fff7f2 0%, #fff 40%);
+    }
+
+    .container {
+      width: min(1080px, 92vw);
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.82);
+      border-bottom: 1px solid #ffe8dd;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+    }
+
+    .logo { font-weight: 800; color: var(--primary); }
+    .nav-links { display: flex; gap: 18px; font-size: 14px; }
+    .nav-links a { color: #444; text-decoration: none; }
+
+    .hero {
+      padding: 64px 0 48px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 26px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-right: 12px;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { border: 1px solid #ffd2c1; color: #a44d31; background: #fff; }
+
+    .hero-card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid #fff0ea;
+    }
+
+    .hero-card img {
+      width: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      height: 260px;
+    }
+
+    section { padding: 24px 0 10px; }
+    h2 { margin-bottom: 14px; font-size: 28px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid #f5e9e4;
+      box-shadow: 0 6px 18px rgba(27, 31, 35, 0.06);
+    }
+
+    .card h3 { margin-top: 8px; }
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      color: #226f9d;
+      background: #eaf7ff;
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+
+    .price { font-weight: 700; color: #b44824; }
+
+    .contact {
+      margin: 34px 0 60px;
+      padding: 22px;
+      border-radius: 18px;
+      background: linear-gradient(130deg, #ffefe8 0%, #eaf8ff 100%);
+      border: 1px solid #ffe0d2;
+    }
+
+    footer {
+      text-align: center;
+      padding: 22px;
+      color: #777;
+      font-size: 13px;
+      border-top: 1px solid #f2e9e5;
+    }
+
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; padding-top: 36px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">🐾 萌爪宠物细化店</div>
+        <div class="nav-links">
+          <a href="#services">服务项目</a>
+          <a href="#packages">会员套餐</a>
+          <a href="#contact">预约到店</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>让每一只毛孩子，<br>都拥有精致舒适的一天</h1>
+        <p class="subtitle">提供洗护、修毛、细节护理与造型设计服务，专注宠物情绪安抚与皮毛健康，让宠物更清爽、更可爱、更自信。</p>
+        <a class="btn btn-primary" href="#contact">立即预约</a>
+        <a class="btn btn-secondary" href="#services">查看项目</a>
+      </div>
+      <div class="hero-card">
+        <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=80" alt="宠物美容中的狗狗"/>
+      </div>
+    </section>
+
+    <section id="services">
+      <h2>热门服务</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">基础护理</span>
+          <h3>净润洗护</h3>
+          <p>温和清洁 + 吹干梳理 + 耳部清理 + 指甲修整。</p>
+          <p class="price">¥98 起</p>
+        </article>
+        <article class="card">
+          <span class="tag">细节精修</span>
+          <h3>精致细化</h3>
+          <p>脸部线条修饰、足底毛修整、卫生部位清理、香波护理。</p>
+          <p class="price">¥168 起</p>
+        </article>
+        <article class="card">
+          <span class="tag">造型设计</span>
+          <h3>萌宠造型剪</h3>
+          <p>根据品种和体态定制造型，打造专属“高颜值出街款”。</p>
+          <p class="price">¥238 起</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="packages">
+      <h2>会员套餐</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>月度清爽卡</h3>
+          <p>每月 2 次基础洗护，含 1 次细节护理。</p>
+          <p class="price">¥299 / 月</p>
+        </article>
+        <article class="card">
+          <h3>季度颜值卡</h3>
+          <p>季度 6 次洗护 + 2 次造型修剪，赠送驱味护理。</p>
+          <p class="price">¥899 / 季</p>
+        </article>
+        <article class="card">
+          <h3>全年尊享卡</h3>
+          <p>全年不限次咨询，12 次护理，优先预约周末时段。</p>
+          <p class="price">¥2999 / 年</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <h2>预约到店</h2>
+      <p><strong>营业时间：</strong> 周一至周日 09:30 - 20:30</p>
+      <p><strong>联系电话：</strong> 400-888-5200</p>
+      <p><strong>门店地址：</strong> 某某市某某区萌宠街 88 号</p>
+      <p>可通过电话或微信小程序预约，首次到店可享 9 折体验价。</p>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 萌爪宠物细化店 · 用心呵护每一份毛茸茸的信任
+  </footer>
+</body>
+</html>
