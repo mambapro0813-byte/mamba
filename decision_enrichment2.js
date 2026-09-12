@@ -1,0 +1,10 @@
+/* AI TRADE — Decision Maker Enrichment 2.0 */
+(()=>{
+const DK='aitrade_decision_makers_v2', DBK='aitrade_full59_v1', OK='aitrade_automation_orchestrator_v1', KEY='aitrade_decision_enrichment_v2';
+const get=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch{return d}};const put=(k,v)=>localStorage.setItem(k,JSON.stringify(v));const now=()=>new Date().toISOString();
+function roleScore(r){r=String(r||'').toLowerCase();if(/owner|founder|ceo|director general|managing director|partner/.test(r))return 100;if(/purchas|procurement|buyer|product manager|commercial director|e-commerce/.test(r))return 90;if(/sales|wholesale|commercial/.test(r))return 75;return 55}
+function run(){let d=get(DK,{people:[]}),db=get(DBK,{customers:[]}),o=get(OK,{actions:[],stats:{actionsCreated:0}}),rows=[];
+ (d.people||[]).forEach(p=>{let rs=roleScore(p.role),conf=+p.confidence||0,contact=/verified|验证|公开企业邮箱|公开电话|官网/.test(String(p.contactStatus||''))?20:0,score=Math.min(100,Math.round(conf*.55+rs*.35+contact*.5));let tier=score>=90?'A+':score>=80?'A':score>=65?'B':'C';let next=tier==='A+'?'优先触达并进入AI SDR':tier==='A'?'补全工作邮箱/电话后开发':tier==='B'?'继续验证职位和公司关系':'暂不消耗付费额度';rows.push({...p,enrichmentScore:score,tier,next});if(['A+','A'].includes(tier)&&!/verified|验证|公开企业邮箱|公开电话|官网/.test(String(p.contactStatus||''))){let fp=`enrich:${p.company}:${p.name}`;if(!o.actions.some(x=>x.fingerprint===fp&&['open','ready','blocked'].includes(x.status))){o.actions.push({id:'ACT-ENR-'+Date.now()+Math.random().toString(36).slice(2,6),fingerprint:fp,type:'decision_maker_enrichment',company:p.company,title:`补全决策人：${p.name}`,next:'优先免费公开源；仅A/A+人选调用RocketReach/Lusha等付费联系人源',priority:tier==='A+'?'high':'normal',status:'open',requiresApproval:false,createdAt:now()});o.stats.actionsCreated=(o.stats.actionsCreated||0)+1;}}});
+ put(KEY,{rows,updatedAt:now()});put(OK,o);window.AITRADE_CLOUD?.push?.();return rows}
+window.DecisionEnrichment2={run};setTimeout(run,2800);setInterval(run,120000);
+})();
