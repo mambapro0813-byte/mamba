@@ -32,6 +32,7 @@ jobs:
               dm='<script src="decision_makers.js"></script>'
               sdr='<script src="sdr2.js"></script>'
               gmail='<script src="gmail_bridge.js"></script>'
+              listener='<script src="inbox_listener2.js"></script>'
               cfg_tag='<script src="cloud-config.js"></script>'
               cloud='<script src="cloud_sync.js"></script>'
               if name=='index.html':
@@ -43,6 +44,8 @@ jobs:
                       s=s.replace('</body>', sdr+'</body>')
                   if gmail not in s:
                       s=s.replace('</body>', gmail+'</body>')
+                  if listener not in s:
+                      s=s.replace('</body>', listener+'</body>')
               if cfg_tag not in s:
                   s=s.replace('</body>', cfg_tag+'</body>')
               if cloud not in s:
