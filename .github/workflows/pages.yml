@@ -19,6 +19,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Inject Hybrid Lead Engine
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="seed_mexico.js"></script>'
+          if tag not in s:
+              s=s.replace('<script src="app.js"></script>', tag+'<script src="app.js"></script>')
+              p.write_text(s, encoding='utf-8')
+          PY
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
