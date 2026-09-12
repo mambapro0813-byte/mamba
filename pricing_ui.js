@@ -1,0 +1,42 @@
+/* AI TRADE — Pricing Brain 2.0 UI integration */
+(function(){
+ const CORE='aitrade_full59_v1', HIST='ai_trade_quotes_v2';
+ const esc=s=>String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+ const money=n=>Number(n||0).toFixed(2);
+ function core(){try{return JSON.parse(localStorage.getItem(CORE)||'null')||{customers:[],quotes:[]}}catch{return{customers:[],quotes:[]}}}
+ function hist(){try{return JSON.parse(localStorage.getItem(HIST)||'[]')||[]}catch{return[]}}
+ function saveHist(a){localStorage.setItem(HIST,JSON.stringify(a));window.AITRADE_CLOUD?.push?.()}
+ function opts(list,val,label){return list.map(x=>`<option value="${esc(val(x))}">${esc(label(x))}</option>`).join('')}
+ function input(){return {
+   customerId:document.getElementById('pbCustomer')?.value||'', model:document.getElementById('pbModel')?.value||'',
+   qty:document.getElementById('pbQty')?.value||1000, unitPrice:document.getElementById('pbUnit')?.value||'',
+   cost:document.getElementById('pbCost')?.value||'', customFee:document.getElementById('pbCustom')?.value||0,
+   packFee:document.getElementById('pbPack')?.value||0, freightPerUnit:document.getElementById('pbFreight')?.value||0,
+   incoterm:document.getElementById('pbIncoterm')?.value||'EXW', currency:document.getElementById('pbCurrency')?.value||'USD',
+   paymentTerms:document.getElementById('pbPayment')?.value||'30% deposit + 70% before shipment',
+   validDays:document.getElementById('pbValid')?.value||15, moq:document.getElementById('pbMOQ')?.value||1000,
+   exclusive:document.getElementById('pbExclusive')?.checked||false, mold:document.getElementById('pbMold')?.checked||false,
+   notes:document.getElementById('pbNotes')?.value||''
+ }}
+ function preview(){if(!window.PricingBrain)return;const r=PricingBrain.calc(input()), box=document.getElementById('pbPreview');if(!box)return;
+   const margin=r.margin===null?'待补成本':(r.margin*100).toFixed(1)+'%';
+   box.innerHTML=`<div class="grid4"><div class="card kpi"><small>建议单价</small><b>${esc(r.currency)} ${money(r.unit)}</b></div><div class="card kpi"><small>含附加费单价</small><b>${esc(r.currency)} ${money(r.landedUnit)}</b></div><div class="card kpi"><small>报价总额</small><b>${esc(r.currency)} ${money(r.total)}</b></div><div class="card kpi"><small>预计毛利</small><b>${margin}</b></div></div><div class="two" style="margin-top:10px"><div class="card"><b>价格边界</b><div class="item">产品参考价：${r.ref?money(r.ref):'待补'}</div><div class="item">目标毛利价：${r.target?money(r.target):'待补成本后计算'}</div><div class="item">预警底线价：${r.floor?money(r.floor):'待补成本后计算'}</div><div class="item">贸易条款：${esc(r.incoterm)}</div></div><div class="card"><b>Human Approval</b>${r.flags.length?r.flags.map(x=>`<div class="item warn">⚠ ${esc(x)}</div>`).join(''):'<div class="item ok">✓ 当前条件未触发强制审批规则</div>'}</div></div>`;
+ }
+ function createQuote(){const i=input();if(!i.customerId||!i.model)return alert('请先选择客户和产品');const q=PricingBrain.quotation(i), c=core();
+   const rec={...q,status:q.approvalRequired?'pending':'draft',price:q.unit,model:q.model,customerId:q.customerId,total:q.total,qty:q.qty,pricingV2:true};
+   c.quotes=c.quotes||[];c.quotes.push(rec);localStorage.setItem(CORE,JSON.stringify(c));const h=hist();h.unshift(rec);saveHist(h);renderHistory();preview();
+   alert(q.approvalRequired?'报价已创建，并进入 Human Approval。':'报价草稿已创建。');
+ }
+ function approve(id){const c=core(),q=(c.quotes||[]).find(x=>x.id===id);if(q){q.status='approved';q.humanApproval='approved';q.approvedAt=new Date().toISOString();localStorage.setItem(CORE,JSON.stringify(c))}let h=hist(),x=h.find(y=>y.id===id);if(x){x.status='approved';x.humanApproval='approved';x.approvedAt=new Date().toISOString();saveHist(h)}renderHistory();}
+ function renderHistory(){const el=document.getElementById('pbHistory');if(!el)return;const a=hist();el.innerHTML=a.map(q=>`<tr><td><b>${esc(q.customer||'-')}</b></td><td>${esc(q.model)}</td><td>${q.qty}</td><td>${esc(q.currency)} ${money(q.unit)}</td><td>${esc(q.incoterm)}</td><td>${money(q.total)}</td><td>${q.flags?.length?q.flags.map(f=>`<span class="tag warn">${esc(f)}</span>`).join(''):'<span class="tag ok">正常</span>'}</td><td><span class="tag ${q.status==='approved'?'ok':'warn'}">${esc(q.status)}</span>${q.status==='pending'?`<br><button class="btn g" style="margin-top:5px" onclick="PricingUI.approve('${q.id}')">人工批准</button>`:''}</td></tr>`).join('')||'<tr><td colspan="8">暂无 Pricing Brain 2.0 报价记录</td></tr>'}
+ function settings(){const c=PricingBrain.cfg;document.getElementById('pbTarget').value=Math.round(c.targetMargin*100);document.getElementById('pbWarn').value=Math.round(c.warningMargin*100)}
+ function saveSettings(){let c=PricingBrain.cfg;c.targetMargin=Math.max(0,Number(document.getElementById('pbTarget').value||22))/100;c.warningMargin=Math.max(0,Number(document.getElementById('pbWarn').value||15))/100;PricingBrain.save();preview();alert('Pricing Brain 参数已保存')}
+ function init(){if(!window.PricingBrain){setTimeout(init,250);return}const sec=document.getElementById('quotes');if(!sec)return;const db=core(),ps=PricingBrain.products();
+ sec.innerHTML=`<div class="top"><div><h1>Pricing Brain 2.0 + AI Quotation 2.0</h1><div class="sub">RFQ → 产品匹配 → 数量阶梯 → 毛利检查 → EXW/FOB附加项 → Human Approval → 正式报价。</div></div><div class="badge">● Profit Guard</div></div>
+ <div class="two"><div class="card"><b>报价输入</b><div class="form" style="margin-top:10px"><label>客户<select id="pbCustomer">${opts(db.customers||[],x=>x.id,x=>x.company||x.name||x.id)}</select></label><label>产品<select id="pbModel">${opts(ps,x=>x.model,x=>`${x.model} · ${x.category||''}`)}</select></label><label>数量<input id="pbQty" type="number" value="1000"></label><label>手工单价（可空）<input id="pbUnit" type="number" step="0.01" placeholder="留空让系统计算"></label><label>成本价（内部）<input id="pbCost" type="number" step="0.01" placeholder="未录入则留空"></label><label>MOQ<input id="pbMOQ" type="number" value="1000"></label><label>包装附加/pcs<input id="pbPack" type="number" step="0.01" value="0"></label><label>定制费/pcs<input id="pbCustom" type="number" step="0.01" value="0"></label><label>运费/pcs<input id="pbFreight" type="number" step="0.01" value="0"></label><label>Incoterm<select id="pbIncoterm"><option>EXW</option><option>FOB</option><option>CIF</option><option>DDP</option></select></label><label>币种<select id="pbCurrency"><option>USD</option><option>CNY</option><option>EUR</option><option>MXN</option></select></label><label>有效期（天）<input id="pbValid" type="number" value="15"></label><label class="span3">付款条件<input id="pbPayment" value="30% deposit + 70% before shipment"></label><label><input id="pbExclusive" type="checkbox"> 独家/区域代理</label><label><input id="pbMold" type="checkbox"> 涉及模具/开发费</label><label class="span3">备注<textarea id="pbNotes" rows="3" placeholder="包装、Logo、交期、认证、特殊要求"></textarea></label></div><div class="toolbar"><button class="btn" id="pbCalc">AI计算报价</button><button class="btn g" id="pbCreate">生成报价草稿</button></div></div>
+ <div class="card"><b>利润与风控设置</b><div class="item">1K：基准价</div><div class="item">3K：-2.5%</div><div class="item">5K：-4.5%</div><div class="item">10K：-6.5%</div><label>目标毛利 %<input id="pbTarget" type="number"></label><label>毛利预警线 %<input id="pbWarn" type="number"></label><div class="toolbar"><button class="btn g" id="pbSaveSettings">保存规则</button></div><small>低于参考价、低于毛利预警、特殊账期、独代、模具、定制费用均触发 Human Approval。</small></div></div>
+ <div id="pbPreview" style="margin-top:10px"></div><div class="card wrap" style="margin-top:10px"><b>AI Quotation 历史</b><table><thead><tr><th>客户</th><th>产品</th><th>数量</th><th>单价</th><th>条款</th><th>总额</th><th>风控</th><th>状态</th></tr></thead><tbody id="pbHistory"></tbody></table></div>`;
+ ['pbQty','pbUnit','pbCost','pbPack','pbCustom','pbFreight','pbIncoterm','pbCurrency','pbPayment','pbExclusive','pbMold','pbModel'].forEach(id=>document.getElementById(id)?.addEventListener('change',preview));
+ document.getElementById('pbCalc').onclick=preview;document.getElementById('pbCreate').onclick=createQuote;document.getElementById('pbSaveSettings').onclick=saveSettings;settings();preview();renderHistory();}
+ window.PricingUI={approve,preview,createQuote};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
