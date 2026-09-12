@@ -16,9 +16,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,9 +23,6 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import os, json
-          cfg={"url":os.getenv("SUPABASE_URL", ""),"anonKey":os.getenv("SUPABASE_ANON_KEY", "")}
-          Path('cloud-config.js').write_text('window.AITRADE_CLOUD_CONFIG='+json.dumps(cfg)+';',encoding='utf-8')
           for name in ['index.html','mobile.html']:
               p=Path(name)
               if not p.exists():
