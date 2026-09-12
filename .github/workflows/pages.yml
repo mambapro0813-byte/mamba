@@ -27,12 +27,12 @@ jobs:
               p=Path(name)
               if not p.exists(): continue
               s=p.read_text(encoding='utf-8')
-              seed='<script src="seed_mexico.js"></script>'; dm='<script src="decision_makers.js"></script>'; sdr='<script src="sdr2.js"></script>'; gmail='<script src="gmail_bridge.js"></script>'; listener='<script src="inbox_listener2.js"></script>'; pricing='<script src="pricing_brain.js"></script>'; pricing_ui='<script src="pricing_ui.js"></script>'; crm2='<script src="crm_followup2.js"></script>'; command='<script src="command_center.js"></script>'; feedback='<script src="feedback_brain2.js"></script>'; orchestrator='<script src="automation_orchestrator.js"></script>'; agentcc='<script src="agent_control_center.js"></script>'; revenue='<script src="revenue_intelligence.js"></script>'; cfg_tag='<script src="cloud-config.js"></script>'; cloud='<script src="cloud_sync.js"></script>'
+              seed='<script src="seed_mexico.js"></script>'; dm='<script src="decision_makers.js"></script>'; sdr='<script src="sdr2.js"></script>'; gmail='<script src="gmail_bridge.js"></script>'; listener='<script src="inbox_listener2.js"></script>'; pricing='<script src="pricing_brain.js"></script>'; pricing_ui='<script src="pricing_ui.js"></script>'; crm2='<script src="crm_followup2.js"></script>'; command='<script src="command_center.js"></script>'; feedback='<script src="feedback_brain2.js"></script>'; orchestrator='<script src="automation_orchestrator.js"></script>'; agentcc='<script src="agent_control_center.js"></script>'; revenue='<script src="revenue_intelligence.js"></script>'; goal='<script src="goal_engine.js"></script>'; cfg_tag='<script src="cloud-config.js"></script>'; cloud='<script src="cloud_sync.js"></script>'
               if name=='index.html':
                   if seed not in s: s=s.replace('<script src="app.js"></script>', seed+'<script src="app.js"></script>')
-                  tags=[dm,sdr,gmail,listener,pricing,pricing_ui,crm2,command,feedback,orchestrator,agentcc,revenue]
+                  tags=[dm,sdr,gmail,listener,pricing,pricing_ui,crm2,command,feedback,orchestrator,agentcc,revenue,goal]
               else:
-                  tags=[pricing,crm2,command,feedback,orchestrator,agentcc,revenue]
+                  tags=[pricing,crm2,command,feedback,orchestrator,agentcc,revenue,goal]
               for tag in tags:
                   if tag not in s: s=s.replace('</body>', tag+'</body>')
               for tag in [cfg_tag,cloud]:
