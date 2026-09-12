@@ -1,0 +1,8 @@
+/* AI TRADE — Background Worker Dispatcher 1.0 UI */
+(()=>{
+const CFG=window.AITRADE_CLOUD_CONFIG||{};
+async function token(){if(!window.supabase||!CFG.url||!CFG.anonKey)return null;const sb=window.supabase.createClient(CFG.url,CFG.anonKey,{auth:{persistSession:true,autoRefreshToken:true}});const {data}=await sb.auth.getSession();return data.session?.access_token||null}
+async function run(){const t=await token();if(!t)throw new Error('请先登录AI TRADE云同步');const r=await fetch(`${CFG.url}/functions/v1/background-worker-dispatcher`,{method:'POST',headers:{'content-type':'application/json','authorization':`Bearer ${t}`,'apikey':CFG.anonKey},body:JSON.stringify({limit:10})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.detail||d.error||'Dispatcher失败');return d}
+function boot(){if(document.getElementById('dispatcherBtn'))return;let b=document.createElement('button');b.id='dispatcherBtn';b.textContent='⚡ Dispatcher';b.style.cssText='position:fixed;right:14px;bottom:58px;z-index:9998;border:0;border-radius:999px;padding:10px 14px;background:#0f766e;color:#fff;font:700 12px Arial;box-shadow:0 8px 24px #0003';b.onclick=async()=>{b.disabled=true;const old=b.textContent;b.textContent='运行中…';try{const d=await run();b.textContent=`完成 ${d.processed||0}`;setTimeout(()=>b.textContent=old,2200)}catch(e){alert(e.message);b.textContent=old}finally{b.disabled=false}};document.body.appendChild(b)}
+window.AI_DISPATCHER={run};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
