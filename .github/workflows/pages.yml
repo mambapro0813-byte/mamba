@@ -36,17 +36,19 @@ jobs:
               pricing='<script src="pricing_brain.js"></script>'
               pricing_ui='<script src="pricing_ui.js"></script>'
               crm2='<script src="crm_followup2.js"></script>'
+              command='<script src="command_center.js"></script>'
               cfg_tag='<script src="cloud-config.js"></script>'
               cloud='<script src="cloud_sync.js"></script>'
               if name=='index.html':
                   if seed not in s:
                       s=s.replace('<script src="app.js"></script>', seed+'<script src="app.js"></script>')
-                  for tag in [dm,sdr,gmail,listener,pricing,pricing_ui,crm2]:
+                  for tag in [dm,sdr,gmail,listener,pricing,pricing_ui,crm2,command]:
                       if tag not in s:
                           s=s.replace('</body>', tag+'</body>')
               else:
-                  if crm2 not in s:
-                      s=s.replace('</body>', crm2+'</body>')
+                  for tag in [pricing,crm2,command]:
+                      if tag not in s:
+                          s=s.replace('</body>', tag+'</body>')
               if cfg_tag not in s:
                   s=s.replace('</body>', cfg_tag+'</body>')
               if cloud not in s:
