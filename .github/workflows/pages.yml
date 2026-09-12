@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Inject Hybrid Lead + Decision Maker Engines
+      - name: Inject Hybrid Lead + Decision Maker + AI SDR 2.0
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -27,10 +27,13 @@ jobs:
           s=p.read_text(encoding='utf-8')
           seed='<script src="seed_mexico.js"></script>'
           dm='<script src="decision_makers.js"></script>'
+          sdr='<script src="sdr2.js"></script>'
           if seed not in s:
               s=s.replace('<script src="app.js"></script>', seed+'<script src="app.js"></script>')
           if dm not in s:
               s=s.replace('</body>', dm+'</body>')
+          if sdr not in s:
+              s=s.replace('</body>', sdr+'</body>')
           p.write_text(s, encoding='utf-8')
           PY
       - name: Setup Pages
