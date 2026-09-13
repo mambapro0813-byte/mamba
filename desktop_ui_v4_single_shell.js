@@ -1,0 +1,8 @@
+/* AI TRADE v4 — single shell guard */
+(()=>{
+const D=()=>matchMedia('(min-width:901px)').matches;
+function enforce(){if(!D())return;document.body.classList.remove('ai-v5','aitrade-v3');document.body.classList.add('aitrade-v4');document.querySelectorAll('#aiTradeV5,#aitradeV3').forEach(x=>x.remove());const roots=[...document.querySelectorAll('#aitradeV4')];roots.slice(1).forEach(x=>x.remove());const legacy=document.querySelector('#legacyAppV3>.app')||document.querySelector('body>.app');const v4=document.getElementById('aitradeV4');if(document.body.classList.contains('v4-core-open')){if(v4)v4.style.display='none';if(legacy)legacy.style.display='grid'}else{if(v4)v4.style.display='grid';if(legacy)legacy.style.display='none'}}
+function closeCore(){document.body.classList.remove('v4-core-open');enforce();window.scrollTo({top:0,left:0,behavior:'auto'})}
+function patchBack(){let b=document.querySelector('.v4-core-back');if(b){b.onclick=closeCore;b.textContent='← 返回 AI TRADE 首页'}}
+function boot(){enforce();patchBack();const o=new MutationObserver(()=>{enforce();patchBack()});o.observe(document.body,{childList:true,subtree:false,attributes:true,attributeFilter:['class']});window.addEventListener('pageshow',enforce);window.addEventListener('resize',enforce)}
+window.AI_TRADE_V4_SHELL={enforce,closeCore};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();})();
