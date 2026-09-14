@@ -1,6 +1,7 @@
 /* AI TRADE — Mobile Tools Hub */
 (()=>{
 const targets=[
+ ['inboundBtn','↙','主动询盘','Q105 询盘、来源与报价审批'],
  ['frwBtn','✨','首次上线','从登录到Production LIVE的顺序向导'],
  ['fplBtn','🚦','Launch','最终上线进度与下一步'],
  ['rpbBtn','🚀','Bootstrap','真实生产自动启动'],

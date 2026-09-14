@@ -64,6 +64,14 @@ Deno.serve(async(req:Request)=>{
     add("业务闭环","RFQ与报价审批（数量证据）",(rfqs||0)>0&&(approved||0)>0?"pass":"blocked",{rfq:rfqs||0,approved_quotes:approved||0},"完成一次RFQ报价审批");
 
     add("业务闭环","同一客户端到端关联验收","blocked","数量统计不能证明发送、客户回复、RFQ、报价审批属于同一业务链；尚未执行关联验收。","使用已获批准的真实业务记录进行关联验收");
+
+    const {data:inbound,error:inboundError}=await userClient.from("ai_trade_inbound_inquiries").select("id,rfq_id,quote_id").eq("user_id",user.id).eq("is_test",false).order("created_at",{ascending:false}).limit(20);
+    add("主动询盘获客","询盘队列可访问",inboundError?"fail":"pass",inboundError?.message||{recent_inquiries:inbound?.length||0},"进入主动询盘获客中心");
+    const first=inbound?.[0];
+    let linked=false;
+    if(first){const {data:quote}=await userClient.from("ai_trade_quotes").select("id,rfq_case_id").eq("user_id",user.id).eq("id",first.quote_id).maybeSingle();linked=!!quote&&quote.rfq_case_id===first.rfq_id;}
+    add("主动询盘获客","公开询盘 → RFQ → 报价关联",linked?"pass":"blocked",linked?"最近询盘与RFQ及报价已关联":"暂无完整关联的公开站询盘记录","在Q105公开页提交已获同意的真实采购需求");
+    add("主动询盘获客","Q105正式产品素材","blocked","正式产品图片与完整参数尚未录入；公开页目前提供产品介绍和询价入口。","补充Q105正式图片和技术参数");
     const passed=checks.filter(x=>x.status==="pass").length;
     const failed=checks.filter(x=>x.status==="fail").length;
     const blocked=checks.filter(x=>x.status==="blocked").length;

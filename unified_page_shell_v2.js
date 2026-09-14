@@ -3,6 +3,7 @@
 const D=()=>matchMedia('(min-width:901px)').matches,$=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 let root,legacy,workspace,body,homeNodes=[],moved=null,marker=null;
 const map={
+ inbound:['inboundCenter','主动询盘获客中心','Q105 / Mexico / Inbound'],
  launch:['today','启动中心','Launch / Production Center'],
  bootstrap:['leads','客户开发','Find Customers / Bootstrap'],
  sales:['crm','销售闭环','Sales Loop / CRM Pipeline'],
