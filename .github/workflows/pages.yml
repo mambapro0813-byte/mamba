@@ -19,6 +19,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -maxdepth 1 -name '*.js' -print0)
       - name: Build one strict AI TRADE desktop shell
         run: |
           python - <<'PY'
@@ -56,6 +63,47 @@ jobs:
               if name=='index.html':
                   s=s.replace('</body>',primary+cleanup+action+crm_auto+unified+completion+googleprod+'</body>')
               p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate deployed entrypoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.sources = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == 'script':
+                      src = dict(attrs).get('src')
+                      if src:
+                          self.sources.append(src.split('?', 1)[0])
+
+          for page in ('index.html', 'mobile.html'):
+              parser = Scripts()
+              parser.feed(Path(page).read_text(encoding='utf-8'))
+              missing = [src for src in parser.sources if not Path(src).is_file()]
+              if missing:
+                  raise SystemExit(f'{page}: missing scripts: {missing}')
+
+          required = {
+              'index.html': {
+                  'primary_dashboard_v2.js',
+                  'primary_dashboard_cleanup.js',
+                  'unified_page_shell_v2.js',
+                  'crm_automation2.js',
+                  'gmail_history_ui.js',
+              }
+          }
+          for page, expected in required.items():
+              parser = Scripts()
+              parser.feed(Path(page).read_text(encoding='utf-8'))
+              absent = sorted(expected - set(parser.sources))
+              if absent:
+                  raise SystemExit(f'{page}: production modules not loaded: {absent}')
           PY
       - name: Setup Pages
         uses: actions/configure-pages@v5
